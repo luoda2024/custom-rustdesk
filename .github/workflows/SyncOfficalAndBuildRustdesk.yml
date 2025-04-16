@@ -54,6 +54,16 @@ on:
         required: false
         type: string
         default: ''
+      custom_slogan:
+        description: '自定义标语（可选）'
+        required: false
+        type: string
+        default: ''
+      custom_slogan_link:
+        description: '自定义标语链接（可选）'
+        required: false
+        type: string
+        default: ''
       rendezvous_server:
         description: '服务器地址（可选，默认使用 secrets.RENDEZVOUS_SERVER）'
         required: false
@@ -164,7 +174,29 @@ jobs:
           # 更新 flutter-nightly.yml 中的标签
           sed -i '/upload-tag:/ s/"nightly"/"${{ needs.setup.outputs.tag_name }}"/' .github/workflows/flutter-nightly.yml
           
+          # 添加自定义标语到 index.tis
+          echo "Adding custom slogan to index.tis"
+          CUSTOM_SLOGAN="${{ github.event.inputs.custom_slogan || '' }}"
+          CUSTOM_SLOGAN_LINK="${{ github.event.inputs.custom_slogan_link || '' }}"
           
+          # 准备要添加的内容
+          THANKS_LINES="\
+            <p style=\"font-weight: bold\">感谢 <a href=\"https://github.com/rustdesk\" style=\"color: #2c8cff; text-decoration: none;\">RustDesk 团队</a></p>\
+            <p style=\"font-weight: bold\">感谢 <a href=\"https://github.com/jackadam1981\" style=\"color: #2c8cff; text-decoration: none;\">jack</a> 的定制</p>"
+          
+          # 如果有自定义标语，添加第三行
+          if [ ! -z "$CUSTOM_SLOGAN" ]; then
+            if [ ! -z "$CUSTOM_SLOGAN_LINK" ]; then
+              THANKS_LINES="$THANKS_LINES\
+            <p style=\"font-weight: bold\"><a href=\"$CUSTOM_SLOGAN_LINK\" style=\"color: #2c8cff; text-decoration: none;\">$CUSTOM_SLOGAN</a></p>"
+            else
+              THANKS_LINES="$THANKS_LINES\
+            <p style=\"font-weight: bold\">$CUSTOM_SLOGAN</p>"
+            fi
+          fi
+          
+          # 使用 sed 添加内容
+          sed -i "/<p style='font-weight: bold'>\" + translate(\"Slogan_tip\") + \"<\/p>/a$THANKS_LINES" src/ui/index.tis
           
           # 提交更改
           git add .
