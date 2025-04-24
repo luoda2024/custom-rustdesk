@@ -148,6 +148,7 @@ jobs:
 
       # 同步上游更新
       - name: Sync with upstream
+        continue-on-error: true
         run: |
           # 克隆上游仓库（带子模块）
           git clone --recursive https://github.com/rustdesk/rustdesk.git upstream-temp
@@ -160,19 +161,28 @@ jobs:
           cp -r upstream-temp/. .
           # 删除临时目录
           rm -rf upstream-temp
-          # 更新配置文件
-          sed -i '/^pub const RENDEZVOUS_SERVERS:/c\pub const RENDEZVOUS_SERVERS: \&[&str] = \&["${{ needs.setup.outputs.rendezvous_server }}"];' libs/hbb_common/src/config.rs
-          sed -i '/^pub const RS_PUB_KEY:/c\pub const RS_PUB_KEY: \&str = "${{ needs.setup.outputs.rs_pub_key }}";' libs/hbb_common/src/config.rs
-          # 只在设置了 API_SERVER 时才替换
-          if [ ! -z "${{ needs.setup.outputs.api_server }}" ]; then
-            echo "API_SERVER is set, updating config.rs"
-            sed -i '/^    pub const OPTION_API_SERVER:/c\    pub const OPTION_API_SERVER: \&str = "${{ needs.setup.outputs.api_server }}";' libs/hbb_common/src/config.rs
-          else
-            echo "API_SERVER is not set, skipping update"
+          
+          # 只在有输入时更新配置文件
+          if [ ! -z "${{ github.event.inputs.rendezvous_server }}" ]; then
+            echo "Updating RENDEZVOUS_SERVERS"
+            sed -i '/^pub const RENDEZVOUS_SERVERS:/c\pub const RENDEZVOUS_SERVERS: \&[&str] = \&["${{ github.event.inputs.rendezvous_server }}"];' libs/hbb_common/src/config.rs
+          fi
+          
+          if [ ! -z "${{ github.event.inputs.rs_pub_key }}" ]; then
+            echo "Updating RS_PUB_KEY"
+            sed -i '/^pub const RS_PUB_KEY:/c\pub const RS_PUB_KEY: \&str = "${{ github.event.inputs.rs_pub_key }}";' libs/hbb_common/src/config.rs
+          fi
+          
+          if [ ! -z "${{ github.event.inputs.api_server }}" ]; then
+            echo "Updating API_SERVER"
+            sed -i '/^    pub const OPTION_API_SERVER:/c\    pub const OPTION_API_SERVER: \&str = "${{ github.event.inputs.api_server }}";' libs/hbb_common/src/config.rs
           fi
           
           # 更新 flutter-nightly.yml 中的标签
-          sed -i '/upload-tag:/ s/"nightly"/"${{ needs.setup.outputs.tag_name }}"/' .github/workflows/flutter-nightly.yml
+          if [ ! -z "${{ github.event.inputs.tag_prefix }}" ]; then
+            echo "Updating tag in flutter-nightly.yml"
+            sed -i '/upload-tag:/ s/"nightly"/"${{ needs.setup.outputs.tag_name }}"/' .github/workflows/flutter-nightly.yml
+          fi
           
           # 添加自定义标语到 index.tis
           echo "Adding custom slogan to index.tis"
@@ -206,6 +216,7 @@ jobs:
 
       # 比较本地和远程文件
       - name: Compare local and remote files
+        continue-on-error: true
         shell: /usr/bin/bash -e {0}
         run: |
           set +e  # 禁用自动退出
@@ -235,6 +246,7 @@ jobs:
 
       # 推送到仓库
       - name: Push to repository with sync
+        continue-on-error: true
         uses: ad-m/github-push-action@master
         with:
           branch: main
@@ -251,6 +263,7 @@ jobs:
     steps:
       # 触发 flutter-nightly.yml 工作流
       - name: Trigger flutter nightly build
+        continue-on-error: true
         uses: actions/github-script@v7
         with:
           github-token: ${{ secrets.WORKFLOW_TOKEN }}
@@ -264,57 +277,10 @@ jobs:
 
       # 等待工作流启动
       - name: Wait for workflow to start
+        continue-on-error: true
         run: |
           echo "Waiting 30 seconds for workflow to start..."
           sleep 30
-
-      # 等待 flutter-nightly 工作流完成
-      - name: Wait for flutter-nightly workflow
-        uses: actions/github-script@v7
-        with:
-          github-token: ${{ github.token }}
-          script: |
-            const maxAttempts = 180; // 最多等待180分钟
-            const interval = 60; // 每60秒检查一次
-            let attempts = 0;
-            
-            while (attempts < maxAttempts) {
-              const runs = await github.rest.actions.listWorkflowRuns({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                workflow_id: 'flutter-nightly.yml',
-                branch: 'main',
-                per_page: 1
-              });
-              
-              if (runs.data.total_count === 0) {
-                console.log('No workflow runs found, waiting...');
-                await new Promise(resolve => setTimeout(resolve, interval * 1000));
-                attempts++;
-                continue;
-              }
-
-              const latestRun = runs.data.workflow_runs[0];
-              console.log(`Latest workflow status: ${latestRun.status}, conclusion: ${latestRun.conclusion}`);
-              
-              if (latestRun.status === 'completed') {
-                if (latestRun.conclusion === 'success' || latestRun.conclusion === 'cancelled') {
-                  console.log(`Workflow completed with conclusion: ${latestRun.conclusion}, continuing with next steps`);
-                  break;
-                } else {
-                  core.setFailed(`Workflow failed with conclusion: ${latestRun.conclusion}`);
-                  break;
-                }
-              }
-              
-              console.log(`Workflow still running, attempt ${attempts + 1}/${maxAttempts}`);
-              await new Promise(resolve => setTimeout(resolve, interval * 1000));
-              attempts++;
-            }
-            
-            if (attempts >= maxAttempts) {
-              core.setFailed('Workflow did not complete within the expected time');
-            }
 
   # 硬重置并强制推送
   hard-reset-and-cleanup:
@@ -325,14 +291,9 @@ jobs:
       contents: write
       pull-requests: write
     steps:
-      # 等待工作流启动
-      - name: Wait for workflow to start
-        run: |
-          echo "Waiting 60 seconds for workflow to start..."
-          sleep 5
-
       # 等待 flutter-nightly 工作流完成
       - name: Wait for flutter-nightly workflow
+        continue-on-error: true
         uses: actions/github-script@v7
         with:
           github-token: ${{ github.token }}
@@ -365,7 +326,7 @@ jobs:
                   console.log(`Workflow completed with conclusion: ${latestRun.conclusion}, continuing with next steps`);
                   break;
                 } else {
-                  core.setFailed(`Workflow failed with conclusion: ${latestRun.conclusion}`);
+                  console.log(`Workflow failed with conclusion: ${latestRun.conclusion}, continuing with next steps`);
                   break;
                 }
               }
@@ -376,7 +337,31 @@ jobs:
             }
             
             if (attempts >= maxAttempts) {
-              core.setFailed('Workflow did not complete within the expected time');
+              console.log('Workflow did not complete within the expected time, continuing with next steps');
+              // 尝试取消正在运行的 workflow
+              try {
+                const runs = await github.rest.actions.listWorkflowRuns({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  workflow_id: 'flutter-nightly.yml',
+                  branch: 'main',
+                  per_page: 1
+                });
+                
+                if (runs.data.total_count > 0) {
+                  const latestRun = runs.data.workflow_runs[0];
+                  if (latestRun.status === 'in_progress') {
+                    await github.rest.actions.cancelWorkflowRun({
+                      owner: context.repo.owner,
+                      repo: context.repo.repo,
+                      run_id: latestRun.id
+                    });
+                    console.log('Successfully cancelled the running workflow');
+                  }
+                }
+              } catch (error) {
+                console.log('Failed to cancel workflow:', error.message);
+              }
             }
 
       #检出 workflow 文件
@@ -388,6 +373,7 @@ jobs:
 
       # 硬重置
       - name: Sync with upstream
+        continue-on-error: true
         run: |
           # 获取同步前的提交
           SYNC_COMMIT=$(git rev-parse HEAD~1)
@@ -398,6 +384,7 @@ jobs:
 
       # 推送到仓库
       - name: Push to repository with sync
+        continue-on-error: true
         uses: ad-m/github-push-action@master
         with:
           branch: main
@@ -410,6 +397,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Delete source code from release
+        continue-on-error: true
         uses: actions/github-script@v7
         with:
           github-token: ${{ github.token }}
@@ -475,6 +463,7 @@ jobs:
       contents: read
     steps:
       - name: Delete workflow runs
+        continue-on-error: true
         uses: Mattraks/delete-workflow-runs@v2
         with:
           token: ${{ github.token }}
