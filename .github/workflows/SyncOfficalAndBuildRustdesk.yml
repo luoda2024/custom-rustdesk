@@ -140,7 +140,7 @@ jobs:
             # 提取Issue内容
             ISSUE_BODY="${{ github.event.issue.body }}"
             
-            # 提取参数 - 查找 --param: 格式的行
+            # 提取参数 - 使用 --param: value 格式
             ISSUE_TAG_PREFIX=$(echo "$ISSUE_BODY" | grep -E '^\s*--tag_prefix:\s*' | sed -E 's/^\s*--tag_prefix:\s*(.*)/\1/' | tr -d '\r' | xargs)
             ISSUE_CUSTOM_SLOGAN=$(echo "$ISSUE_BODY" | grep -E '^\s*--custom_slogan:\s*' | sed -E 's/^\s*--custom_slogan:\s*(.*)/\1/' | tr -d '\r' | xargs)
             ISSUE_CUSTOM_SLOGAN_LINK=$(echo "$ISSUE_BODY" | grep -E '^\s*--custom_slogan_link:\s*' | sed -E 's/^\s*--custom_slogan_link:\s*(.*)/\1/' | tr -d '\r' | xargs)
