@@ -264,6 +264,8 @@ jobs:
           cp -r upstream-temp/. .
           # 删除临时目录
           rm -rf upstream-temp
+          # 删除定时任务
+          sed -i '4,6d' .github/workflows/flutter-nightly.yml
 
       # 定制客户端
       - name: Customize client
