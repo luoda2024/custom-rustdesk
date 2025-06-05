@@ -5,7 +5,7 @@ pub static ref T: std::collections::HashMap<&'static str, &'static str> =
         ("Your Desktop", "LUODA远程协助"),
         ("desk_tip", "解压游戏免费畅玩：Dicad.cn !"),
         ("Password", "密码"),
-        ("Ready", "就绪"),
+        ("Ready", "就绪 🎮 [好玩又免费的解压游戏，输入 Dicad.cn 进入网站畅玩！](https://dicad.cn)"),
         ("Established", "已建立"),
         ("connecting_status", "正在接入 RustDesk 网络..."),
         ("Enable service", "允许服务"),
