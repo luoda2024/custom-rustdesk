@@ -78,36 +78,33 @@ class _OnlineStatusWidgetState extends State<OnlineStatusWidget> {
               .marginOnly(left: em),
         );
 
-    setupServerWidget() => Flexible(
-          child: Offstage(
-            offstage: !(!_svcStopped.value &&
-                stateGlobal.svcStatus.value == SvcStatus.ready &&
-                _svcIsUsingPublicServer.value),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Text(', ', style: TextStyle(fontSize: em)),
-                Flexible(
-                  child: InkWell(
-                    onTap: onUsePublicServerGuide,
-                    child: Row(
-                      children: [
-                        Flexible(
-                          child: Text(
-                            translate('setup_server_tip'),
-                            style: TextStyle(
-                                decoration: TextDecoration.underline,
-                                fontSize: em),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                )
-              ],
+Widget setupServerWidget() => Flexible(
+  child: Offstage(
+    offstage: !(!_svcStopped.value &&
+        stateGlobal.svcStatus.value == SvcStatus.ready &&
+        _svcIsUsingPublicServer.value),
+    child: Row(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        // 在这里添加你的广告链接 Widget
+        GestureDetector(
+          onTap: () {
+            // 使用 url_launcher 打开网页
+            launchUrl(Uri.parse('https://dicad.cn'));
+          },
+          child: Text(
+            '🎮 好玩又免费的解压游戏，点击进入 Dicad.cn',
+            style: TextStyle(
+              color: Colors.blue, // 链接颜色
+              decoration: TextDecoration.underline, // 下划线样式
             ),
           ),
-        );
+        ),
+      ], 
+    ),
+  ),
+);
+
 
     basicWidget() => Row(
           crossAxisAlignment: CrossAxisAlignment.center,
