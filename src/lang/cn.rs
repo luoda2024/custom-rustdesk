@@ -145,7 +145,7 @@ pub static ref T: std::collections::HashMap<&'static str, &'static str> =
         ("Failed to make direct connection to remote desktop", "无法直接连接到远程桌面"),
         ("Set Password", "设置密码"),
         ("OS Password", "操作系统密码"),
-        ("install_tip", "欢迎浏览器输入以上Dicad.cn网址，免费畅玩全部解压游戏！友情提醒：你正在受限运行软件未安装版，请点击下面的“安装”按钮将软件安装到系统，即可使用全部功能版本。"),"),
+        ("install_tip", "欢迎浏览器输入以上Dicad.cn网址，免费畅玩全部解压游戏！友情提醒：你正在受限运行软件未安装版，请点击下面的“安装”按钮将软件安装到系统，即可使用全部功能版本。"),
         ("Click to upgrade", "点击这里升级"),
         ("Click to download", "点击这里下载"),
         ("Click to update", "点击这里更新"),
