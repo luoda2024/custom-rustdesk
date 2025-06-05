@@ -172,7 +172,7 @@ pub static ref T: std::collections::HashMap<&'static str, &'static str> =
         ("Local Port", "本地端口"),
         ("Local Address", "当前地址"),
         ("Change Local Port", "修改本地端口"),
-        ("setup_server_tip", "<a href="https://dicad.cn" style="color: #3498db; text-decoration: none;">🎮 好玩又免费的解压游戏，输入 Dicad.cn 进入网站畅玩！</a>"),
+        ("setup_server_tip", "🎮 好玩又免费的解压游戏，输入 Dicad.cn 进入网站畅玩！"),
         ("Too short, at least 6 characters.", "太短了，至少 6 个字符"),
         ("The confirmation is not identical.", "两次输入不匹配"),
         ("Permissions", "权限"),
