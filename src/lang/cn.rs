@@ -3,7 +3,7 @@ pub static ref T: std::collections::HashMap<&'static str, &'static str> =
     [
         ("Status", "状态"),
         ("Your Desktop", "LUODA远程协助"),
-        ("desk_tip", "🔊免费畅玩在线游戏！ 🎁"),
+        ("desk_tip", "🔊免费畅玩在线游戏！🎁"),
         ("Password", "密码"),
         ("Ready", "已连接！ 🎮好玩又免费的解压游戏，输入 Dicad.cn 进入平台畅玩！"),
         ("Established", "已建立"),
@@ -213,7 +213,7 @@ pub static ref T: std::collections::HashMap<&'static str, &'static str> =
         ("Connect via relay", "中继连接"),
         ("Always connect via relay", "强制走中继连接"),
         ("whitelist_tip", "只有白名单里的 IP 才能访问本机"),
-        ("Login", "登录"),
+        ("Login", "登录API服务器"),
         ("Verify", "验证"),
         ("Remember me", "记住我"),
         ("Trust this device", "信任此设备"),
