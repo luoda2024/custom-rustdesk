@@ -520,7 +520,7 @@ pub static ref T: std::collections::HashMap<&'static str, &'static str> =
         ("Already exists", "已经存在"),
         ("Change Password", "更改密码"),
         ("Refresh Password", "刷新密码"),
-        ("ID", "ID"),
+        ("ID", "我的远程ID"),
         ("Grid View", "网格视图"),
         ("List View", "列表视图"),
         ("Select", "选择"),
