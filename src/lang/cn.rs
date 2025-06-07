@@ -7,7 +7,7 @@ pub static ref T: std::collections::HashMap<&'static str, &'static str> =
         ("Password", "密码"),
         ("Ready", "已连接！🎮好玩又免费的解压游戏，输入 Dicad.cn 进入平台畅玩！"),
         ("Established", "已建立"),
-        ("connecting_status", "正在接入 RustDesk 网络..."),
+        ("connecting_status", "正在接入 Dicad.cn 网络..."),
         ("Enable service", "允许服务"),
         ("Start service", "启动服务"),
         ("Service is running", "服务正在运行"),
